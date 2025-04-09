@@ -1,3 +1,22 @@
+This is clarity20's fork of bash 5.2. It is intended as a sandbox for developing and building
+a prototype "bash function library" as a shared object so that my bash2py project can stand 
+independent of bash to the greatest extent possible. Bash2py should then no longer be tied to 
+a specific version of bash and we should be able to make the bash2py project space much cleaner. 
+
+The libbash.so that we intend to build cannot contain bash's main() function because bash2py
+will provide its own. We can separate bash's main() from the module that contains it, namely 
+shell.c, and build libbash.so from everything else. As a test we can link main() to libbash.so
+to give us a functionally normal executable bash[.exe]. When developing the new and improved 
+bash2py "for real" we can start with its existing main().
+
+As for bash2py's many deltas from bash, there is no STANDARD way to tap into a "shared-object bash" 
+of whatever version to impose our changes. We have to override libbash.so's behavior from the outside.
+Fortunately the GNU C compiler provides a NON-STANDARD mechanism that allows us to do this: enter
+the "--wrap" compiler flag. See, for instance, question 46444052 on Stack Overflow, "How to wrap 
+functions with the `--wrap` option correctly?" But (adroit) usage of the --wrap option will be
+a tactic of the bash2py project. We will not employ it here.
+
+
 Introduction
 ============
 
