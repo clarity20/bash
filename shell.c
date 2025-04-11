@@ -362,12 +362,12 @@ _cygwin32_check_tmp ()
 #if defined (NO_MAIN_ENV_ARG)
 /* systems without third argument to main() */
 int
-main (argc, argv)
+xxx_former_main (argc, argv)
      int argc;
      char **argv;
 #else /* !NO_MAIN_ENV_ARG */
 int
-main (argc, argv, env)
+xxx_former_main (argc, argv, env)
      int argc;
      char **argv, **env;
 #endif /* !NO_MAIN_ENV_ARG */
