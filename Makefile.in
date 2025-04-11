@@ -590,11 +590,12 @@ LOADABLES_DIR = ${top_builddir}/examples/loadables
 .made: $(Program) bashbug $(SDIR)/man2html$(EXEEXT)
 	@echo "$(Program) last made for a $(Machine) running $(OS)" >.made
 
-$(Program): $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
+# The libbash.so target replaces bash in this code branch since we have eliminated main().
+libbash libbash.so: $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
 	$(RM) $@
-	$(PURIFY) $(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LDFLAGS) -o $(Program) $(OBJECTS) $(LIBS)
-	ls -l $(Program)
-	-$(SIZE) $(Program)
+	$(PURIFY) $(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LDFLAGS) -fPIC -shared -o libbash.so $(OBJECTS) $(LIBS)
+	ls -l libbash.so
+	-$(SIZE) libbash.so
 
 .build:	$(SOURCES) config.h Makefile $(DEFDIR)/builtext.h version.h $(VERSPROG)
 	@echo
