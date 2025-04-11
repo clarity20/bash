@@ -14,8 +14,10 @@ The simplest way to compile Bash is:
      Running 'configure' takes some time.  While running, it prints
      messages telling which features it is checking for.
 
-  2. Type 'make' to compile Bash and build the 'bashbug' bug reporting
-     script.
+  2. Type 'make' to compile 'libbash.so', the Bash object library.
+     Subsequent steps do not apply to this fork of 'bash', but a 'bash'
+     executable can be built by switching to the branch
+     'with_separate_main' and following the instructions there.
 
   3. Optionally, type 'make tests' to run the Bash test suite.
 
