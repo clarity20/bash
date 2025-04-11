@@ -1,21 +1,32 @@
-This is clarity20's fork of bash 5.2. It is intended as a sandbox for developing and building
-a prototype "bash function library" as a shared object so that my bash2py project can stand 
-independent of bash to the greatest extent possible. Bash2py should then no longer be tied to 
-a specific version of bash and we should be able to make the bash2py project space much cleaner. 
+What is this repo?
+==================
 
-The libbash.so that we intend to build cannot contain bash's main() function because bash2py
-will provide its own. We can separate bash's main() from the module that contains it, namely 
-shell.c, and build libbash.so from everything else. As a test we can link main() to libbash.so
-to give us a functionally normal executable bash[.exe]. When developing the new and improved 
-bash2py "for real" we can start with its existing main().
+This repo, 'clarity20/bash', is a fork of bash-5.2 that shows how to develop and build a 
+"bash function library" as a shared object for use with `clarity20/bash2py`. You should be able to 
+build the shared object `libbash.so` by following the steps in the (modified) document `INSTALL` 
+included in this package. If you are working with another version of bash we invite you to download
+its source from `bminor/bash`, apply the changes seen here, and build the `*.so` you need. 
 
-As for bash2py's many deltas from bash, there is no STANDARD way to tap into a "shared-object bash" 
-of whatever version to impose our changes. We have to override libbash.so's behavior from the outside.
-Fortunately the GNU C compiler provides a NON-STANDARD mechanism that allows us to do this: enter
-the "--wrap" compiler flag. See, for instance, question 46444052 on Stack Overflow, "How to wrap 
-functions with the `--wrap` option correctly?" But (adroit) usage of the --wrap option will be
-a tactic of the bash2py project. We will not employ it here.
+Our goal is to cleanly separate `bash` from `bash2py` starting with `bash2py-4.0` so the latter 
+can be bash-version-agnostic. This will make `bash2py` more versatile while enabling us to 
+clean up the project space for future work. 
 
+Technical details
+=================
+
+We need to remove bash's function main() from `libbash.so` to avoid a name clash with the 
+main() function of `bash2py`. One way is to rename main() in the `bash` source code, as in 
+the branch `renamed_main`. Another way is to separate it into another module as in the branch 
+`with_separate_main`. The former is an easier and cleaner fix, but the latter offers an easy
+sanity check by building `bash[.exe]` from `libbash.so`.
+
+As for `bash2py`'s many deltas from `bash`, we have to selectively override `libbash.so`'s behavior 
+from the outside. Fortunately the GNU C compiler provides a NON-STANDARD mechanism for this in
+the `--wrap` compiler flag. See, for instance, question 46444052 on Stack Overflow, "How to wrap 
+functions with the `--wrap` option correctly?" But (adroit) usage of the `--wrap` option 
+concerns the `bash2py` project only. We will not discuss it here.
+
+The standard `bash` README follows.
 
 Introduction
 ============
