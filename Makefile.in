@@ -442,7 +442,7 @@ LIBRARY_LDFLAGS = $(READLINE_LDFLAGS) $(HISTORY_LDFLAGS) $(GLOB_LDFLAGS) \
 # The shell itself
 #
 
-# The main source code for the Bourne Again SHell.
+# The main source code for the Bourne Again SHell library. main.c not included.
 CSOURCES = shell.c eval.c parse.y general.c make_cmd.c print_cmd.c y.tab.c \
 	   dispose_cmd.c execute_cmd.c variables.c $(GLOBC) version.c \
 	   expr.c copy_cmd.c flags.c subst.c hashcmd.c hashlib.c mailcheck.c \
@@ -454,7 +454,7 @@ CSOURCES = shell.c eval.c parse.y general.c make_cmd.c print_cmd.c y.tab.c \
 
 HSOURCES = shell.h flags.h trap.h hashcmd.h hashlib.h jobs.h builtins.h \
 	   general.h variables.h config.h $(ALLOC_HEADERS) alias.h \
-	   quit.h unwind_prot.h syntax.h ${GRAM_H} \
+	   shell_shared.h quit.h unwind_prot.h syntax.h ${GRAM_H} \
 	   command.h input.h error.h bashansi.h dispose_cmd.h make_cmd.h \
 	   subst.h externs.h siglist.h bashhist.h bashline.h bashtypes.h \
 	   array.h arrayfunc.h sig.h mailcheck.h bashintl.h bashjmp.h \
@@ -590,11 +590,16 @@ LOADABLES_DIR = ${top_builddir}/examples/loadables
 .made: $(Program) bashbug $(SDIR)/man2html$(EXEEXT)
 	@echo "$(Program) last made for a $(Machine) running $(OS)" >.made
 
-$(Program): $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
+# The NEW bash[.exe], built by linking main.o and libbash.so
+$(Program): main.o $(BUILTINS_DEP) $(LIBDEP) .build
 	$(RM) $@
-	$(PURIFY) $(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LDFLAGS) -o $(Program) $(OBJECTS) $(LIBS)
+	$(PURIFY) $(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) -L. $(LDFLAGS) -o $(Program) main.o $(LIBS) -l:libbash.so
 	ls -l $(Program)
 	-$(SIZE) $(Program)
+
+libbash libbash.so: $(OBJECTS) $(BUILTINS_DEP) $(LIBDEP) .build
+	$(RM) $@
+	$(PURIFY) $(CC) $(BUILTINS_LDFLAGS) $(LIBRARY_LDFLAGS) $(LDFLAGS) -fPIC -shared -o libbash.so $(OBJECTS) $(LIBS)
 
 .build:	$(SOURCES) config.h Makefile $(DEFDIR)/builtext.h version.h $(VERSPROG)
 	@echo
@@ -1172,7 +1177,7 @@ redir.o: flags.h execute_cmd.h redir.h input.h
 redir.o: ${DEFDIR}/pipesize.h
 redir.o: trap.h assoc.h $(BASHINCDIR)/ocache.h $(BASHINCDIR)/chartypes.h
 shell.o: config.h bashtypes.h ${BASHINCDIR}/posixstat.h bashansi.h ${BASHINCDIR}/ansi_stdlib.h ${BASHINCDIR}/filecntl.h
-shell.o: shell.h syntax.h config.h bashjmp.h ${BASHINCDIR}/posixjmp.h command.h ${BASHINCDIR}/stdc.h error.h
+shell.o: shell_shared.h shell.h syntax.h config.h bashjmp.h ${BASHINCDIR}/posixjmp.h command.h ${BASHINCDIR}/stdc.h error.h
 shell.o: general.h xmalloc.h bashtypes.h variables.h arrayfunc.h conftypes.h array.h hashlib.h
 shell.o: quit.h ${BASHINCDIR}/maxpath.h unwind_prot.h dispose_cmd.h
 shell.o: make_cmd.h subst.h sig.h pathnames.h externs.h parser.h
@@ -1180,6 +1185,7 @@ shell.o: flags.h trap.h mailcheck.h builtins.h $(DEFSRC)/common.h
 shell.o: jobs.h siglist.h input.h execute_cmd.h findcmd.h bashhist.h bashline.h
 shell.o: ${GLOB_LIBSRC}/strmatch.h ${BASHINCDIR}/posixtime.h ${BASHINCDIR}/posixwait.h
 shell.o: ${BASHINCDIR}/ocache.h ${BASHINCDIR}/chartypes.h assoc.h alias.h
+main.o: shell.o
 sig.o: config.h bashtypes.h
 sig.o: shell.h syntax.h config.h bashjmp.h ${BASHINCDIR}/posixjmp.h command.h ${BASHINCDIR}/stdc.h error.h
 sig.o: general.h xmalloc.h bashtypes.h variables.h arrayfunc.h conftypes.h array.h hashlib.h
